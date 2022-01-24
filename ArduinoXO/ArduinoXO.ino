@@ -37,6 +37,12 @@ int led_down[9] = {2, 3, 4, 5, 6, 7, 8, 9, 10};
 char player;
 const int PLAYER_MODE = 21;
 
+String board[3][3] = {
+  {"-", "-", "-"},
+  {"-", "-", "-"},
+  {"-", "-", "-"}
+  };
+
 void setup()
 {
   Serial.begin(9600);
@@ -71,6 +77,16 @@ void setup()
   lcd.clear();
 }
 
+void loop()
+{
+  
+}
+
+void displayLCD()
+{
+  
+}
+
 void turnLedOn(int n)
 {
   if (player == 'x')
@@ -83,12 +99,4 @@ void turnLedOn(int n)
     digitalWrite(led_down[n], HIGH);
     digitalWrite(led_up[n], LOW);
   }
-}
-
-void loop()
-{
-  turnLedOn(1);
-  delay(2);
-  turnLedOn(1);
-  delay(2);
 }
