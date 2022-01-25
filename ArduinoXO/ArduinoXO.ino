@@ -130,6 +130,63 @@ bool validate(char c)
   return false;
 }
 
+void checkFinish()
+{
+  // Row check
+  for (int i = 0; i < 3; ++i)
+  {
+    char c = board[i][0];
+    bool found = true;
+    for (int j = i; j < 3; ++j)
+      if (board[i][j] != c)
+      {
+        found = false;
+        break;
+      }
+    if (found)
+    {
+      finish(c);
+      return;
+    }
+  }
+
+  // Column check
+  for (int j = 0; j < 3; ++j)
+  {
+    char c = board[0][j];
+    bool found = true;
+    for (int i = 1; i < 3; ++i)
+      if (board[i][j] != c)
+      {
+        found = false;
+        break;
+      }
+    if (found)
+    {
+      finish(c);
+      return;
+    }
+  }
+
+  // X
+  char c = board[1][1];
+  if (c != '-' && board[0][0] == c &&  board[2][2] == c)
+  {
+    finish(c);
+    return;
+  }
+  if (c != '-' && board[0][2] == c &&  board[2][0] == c)
+  {
+    finish(c);
+    return;
+  }
+}
+
+void finish(char c)
+{
+  
+}
+
 void changeTurn()
 {
   if (turn == 'X')
