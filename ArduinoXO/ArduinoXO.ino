@@ -138,16 +138,7 @@ void checkFinish()
   for (int i = 0; i < 3; ++i)
   {
     char c = board[i][0];
-    if (c == '-')
-      continue;
-    bool found = true;
-    for (int j = i; j < 3; ++j)
-      if (board[i][j] != c)
-      {
-        found = false;
-        break;
-      }
-    if (found)
+    if (c != '-' && board[i][1] == c && board[i][2] == c)
     {
       finish(c);
       return;
@@ -158,16 +149,7 @@ void checkFinish()
   for (int j = 0; j < 3; ++j)
   {
     char c = board[0][j];
-    if (c == '-')
-      continue;
-    bool found = true;
-    for (int i = 1; i < 3; ++i)
-      if (board[i][j] != c)
-      {
-        found = false;
-        break;
-      }
-    if (found)
+    if (c != '-' && board[1][j] == c && board[2][j] == c)
     {
       finish(c);
       return;
@@ -186,11 +168,31 @@ void checkFinish()
     finish(c);
     return;
   }
+
+  // Handling Draw
+  bool found = false;
+  for (int i = 0; i < 3; ++i)
+    for (int j = 0; j < 3; ++j)
+      if (board[i][j] == '-')
+      {
+        found = true;
+        break;
+      }
+  if (!found)
+  {
+    finish('-');
+    return;
+  }
 }
 
 void finish(char winner)
 {
-  if (winner == player)
+  if (winner == '-')
+  {
+    lcd.setCursor(0, 4);
+    lcd.print("Draw!");
+  }
+  else if (winner == player)
   {
     digitalWrite(LED_RED, HIGH);
     digitalWrite(LED_GREEN, HIGH);
