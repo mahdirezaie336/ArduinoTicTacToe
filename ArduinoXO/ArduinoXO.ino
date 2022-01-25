@@ -90,16 +90,17 @@ void loop()
       if (ack != '\0')
       {
         putOnBoard(key, player);
-        if (turn == 'X')
-          turn = 'O';
-        else
-          turn = 'X';
+        changeTurn();
       }
     }
   }
   else
   {
-    
+    char key = getFromOtherSide();
+    if (!validate(key))
+    {
+      
+    }
   }
 }
 
@@ -112,6 +113,14 @@ bool validate(char c)
   if (getFromBoard(c) == '-')
     return true;
   return false;
+}
+
+void changeTurn()
+{
+  if (turn == 'X')
+    turn = 'O';
+  else
+    turn = 'X';
 }
 
 void putOnBoard(char position, char xo)
