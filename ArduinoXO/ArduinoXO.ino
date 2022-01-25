@@ -99,6 +99,7 @@ void loop()
       {
         putOnBoard(key, player);
         updateDisplay();
+        checkFinish();
         changeTurn();
       }
     }
@@ -116,6 +117,7 @@ void loop()
     Serial.print('1');
     putOnBoard(key, turn);
     updateDisplay();
+    checkFinish();
     changeTurn();
   }
 }
@@ -136,6 +138,8 @@ void checkFinish()
   for (int i = 0; i < 3; ++i)
   {
     char c = board[i][0];
+    if (c == '-')
+      continue;
     bool found = true;
     for (int j = i; j < 3; ++j)
       if (board[i][j] != c)
@@ -154,6 +158,8 @@ void checkFinish()
   for (int j = 0; j < 3; ++j)
   {
     char c = board[0][j];
+    if (c == '-')
+      continue;
     bool found = true;
     for (int i = 1; i < 3; ++i)
       if (board[i][j] != c)
@@ -206,7 +212,6 @@ void finish(char winner)
   for (int i = 0; i < 3; ++i)
     for (int j = 0; j < 3; ++j)
       board[i][j] = '-';
-  turn = 'X';
 }
 
 void changeTurn()
