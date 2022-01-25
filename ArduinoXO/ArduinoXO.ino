@@ -83,9 +83,18 @@ void loop()
   if (turn == player)
   {
     char key = keypad.waitForKey();
-    if (validate(key - '1'))
+    if (validate(key))
     {
-      
+      Serial.print(key);
+      char ack = readFromOtherSide();
+      if (ack != '\0')
+      {
+        putOnBoard(key, player);
+        if (turn == 'X')
+          turn = 'O';
+        else
+          turn = 'X';
+      }
     }
   }
   else
@@ -94,12 +103,27 @@ void loop()
   }
 }
 
-bool validate(int n)
+bool validate(char c)
 {
+  int n = (int) c - '1';
   // n is in range [0, 8]
-  if (board[n/3][n%3] == '-')
+  if (n > 8 || n < 0)
+    return false;
+  if (getFromBoard(c) == '-')
     return true;
   return false;
+}
+
+void putOnBoard(char position, char xo)
+{
+  int n = (int) c - '1';
+  board[n/3][n%3] = xo;
+}
+
+int getFromBoard(char c)
+{
+  int n = (int) c - '1';
+  return board[n/3][n%3];
 }
 
 char readFromOtherSide()
