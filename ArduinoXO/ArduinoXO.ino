@@ -182,9 +182,31 @@ void checkFinish()
   }
 }
 
-void finish(char c)
+void finish(char winner)
 {
+  if (winner == player)
+  {
+    digitalWrite(LED_RED, HIGH);
+    digitalWrite(LED_GREEN, HIGH);
+    digitalWrite(LED_YELLOW, HIGH);
+    lcd.setCursor(0, 4);
+    lcd.print("You Win!");
+  }
+  else
+  {
+    digitalWrite(LED_RED, LOW);
+    digitalWrite(LED_GREEN, LOW);
+    digitalWrite(LED_YELLOW, LOW);
+    lcd.setCursor(0, 4);
+    lcd.print("You Lose!");
+  }
   
+  keypad.waitForKey();
+  // Reset
+  for (int i = 0; i < 3; ++i)
+    for (int j = 0; j < 3; ++j)
+      board[i][j] = '-';
+  turn = 'X';
 }
 
 void changeTurn()
