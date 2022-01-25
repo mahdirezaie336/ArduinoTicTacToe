@@ -90,14 +90,15 @@ void loop()
     digitalWrite(LED_RED, LOW);
     char key = keypad.waitForKey();
     
-    lcd.setCursor(0, 4);
-    lcd.print("Pressed " + key);
-    delay(5);
-    
     if (validate(key))
     {
       Serial.print(key);
       char ack = readFromOtherSide();
+
+      lcd.setCursor(0, 4);
+      lcd.print(ack);
+      delay(100);
+      
       if (ack != 'z')
       {
         putOnBoard(key, player);
@@ -111,13 +112,12 @@ void loop()
     digitalWrite(LED_RED, HIGH);
     digitalWrite(LED_GREEN, LOW);
     char key = readFromOtherSide();
-    delay(2);
     if (!validate(key))
     {
-      Serial.write('z');
+      Serial.print('z');
       return;
     }
-    Serial.write('1');
+    Serial.print('1');
     putOnBoard(key, turn);
     updateDisplay();
     changeTurn();
@@ -157,21 +157,22 @@ int getFromBoard(char c)
 char readFromOtherSide()
 {
   digitalWrite(LED_YELLOW, HIGH);
-  while (!Serial.available());
+  while (Serial.available() <= 0);
   digitalWrite(LED_YELLOW, LOW);
-  char s = Serial.read();
+  int s = Serial.read();
   lcd.setCursor(0, 4);
   lcd.print(s);
   delay(10);
-  return s;
+  return (char) s;
 }
 
 void updateDisplay()
 {
   displayBoard();
-  for (int i = 0; i < 9; ++i)
-    if (board[i/3][i%3] != '-')
-      turnLEDOn(i, board[i/3][i%3]);
+  if (player == 'X')
+    for (int i = 0; i < 9; ++i)
+      if (board[i/3][i%3] != '-')
+        turnLEDOn(i, board[i/3][i%3]);
 }
 
 void displayBoard()
