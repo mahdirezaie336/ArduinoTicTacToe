@@ -94,10 +94,6 @@ void loop()
     {
       Serial.print(key);
       char ack = readFromOtherSide();
-
-      lcd.setCursor(0, 4);
-      lcd.print(ack);
-      delay(100);
       
       if (ack != 'z')
       {
@@ -127,7 +123,7 @@ void loop()
 bool validate(char c)
 {
   // n is in range [0, 8]
-  if (c > '8' || c < '0')
+  if (c > '9' || c < '0')
     return false;
   if (getFromBoard(c) == '-')
     return true;
@@ -160,8 +156,6 @@ char readFromOtherSide()
   while (Serial.available() <= 0);
   digitalWrite(LED_YELLOW, LOW);
   int s = Serial.read();
-  lcd.setCursor(0, 4);
-  lcd.print(s);
   delay(10);
   return (char) s;
 }
