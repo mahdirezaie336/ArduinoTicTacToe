@@ -36,11 +36,12 @@ int led_down[9] = {2, 3, 4, 5, 6, 7, 8, 9, 10};
 
 char player;
 const int PLAYER_MODE = 21;
+char turn = 'X';
 
 String board[3][3] = {
-  {"-", "-", "-"},
-  {"-", "-", "-"},
-  {"-", "-", "-"}
+  {'-', '-', '-'},
+  {'-', '-', '-'},
+  {'-', '-', '-'}
   };
 
 void setup()
@@ -69,9 +70,9 @@ void setup()
   // Setting Player from player pin
   pinMode(PLAYER_MODE, INPUT);
   if (digitalRead(PLAYER_MODE) == HIGH)
-    player = 'x';
+    player = 'X';
   else
-    player = 'y';
+    player = 'O';
   
   lcd.begin(20, 4);
   lcd.clear();
@@ -79,17 +80,48 @@ void setup()
 
 void loop()
 {
-  
+  if (turn == player)
+  {
+    char key = keypad.waitForKey();
+    if (validate(key - '1'))
+    {
+      
+    }
+  }
+  else
+  {
+    
+  }
 }
 
-void displayLCD()
+bool validate(int n)
 {
-  
+  // n is in range [0, 8]
+  if (board[n/3][n%3] == '-')
+    return true;
+  return false;
 }
 
-void turnLedOn(int n)
+char readFromOtherSide()
 {
-  if (player == 'x')
+  while (!Serial.available());
+  return Serial.read();
+}
+
+void displayBoard()
+{
+  lcd.clear();
+  for (int i = 0; i < 3; ++i)
+  {
+    lcd.setCursor(i, 0);
+    for (int j = 0; j < 3; ++j)
+      lcd.print(board[i][j]);
+  }
+}
+
+void turnLEDOn(int n)
+{
+  if (player == 'X')
   {
     digitalWrite(led_up[n], HIGH);
     digitalWrite(led_down[n], LOW);
