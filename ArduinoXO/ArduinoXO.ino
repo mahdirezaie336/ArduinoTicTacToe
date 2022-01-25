@@ -1,10 +1,10 @@
 #include <Keypad.h>
 #include <LiquidCrystal.h>
 
-#define LED_Mode1 49
-#define LED_Mode2 50
-#define LED_Mode3 51
-#define LED_Mode4 52
+#define LED_YELLOW 18
+#define LED_GREEN 19
+#define LED_RED 20
+#define PLAYER_MODE 21
 
 #define RS_PIN 41
 #define EN_PIN 42
@@ -35,10 +35,9 @@ int led_up[9] = {31, 32, 33, 34, 35, 36, 37, 38, 39};
 int led_down[9] = {2, 3, 4, 5, 6, 7, 8, 9, 10};
 
 char player;
-const int PLAYER_MODE = 21;
 char turn = 'X';
 
-String board[3][3] = {
+char board[3][3] = {
   {'-', '-', '-'},
   {'-', '-', '-'},
   {'-', '-', '-'}
@@ -67,6 +66,10 @@ void setup()
     pinMode(led_down[i], OUTPUT);
   }
 
+  pinMode(LED_RED, OUTPUT);
+  pinMode(LED_GREEN, OUTPUT);
+  pinMode(LED_YELLOW, OUTPUT);
+
   // Setting Player from player pin
   pinMode(PLAYER_MODE, INPUT);
   if (digitalRead(PLAYER_MODE) == HIGH)
@@ -80,35 +83,51 @@ void setup()
 
 void loop()
 {
+  displayBoard();
   if (turn == player)
   {
+    digitalWrite(LED_GREEN, HIGH);
+    digitalWrite(LED_RED, LOW);
     char key = keypad.waitForKey();
+    
+    lcd.setCursor(0, 4);
+    lcd.print("Pressed " + key);
+    delay(5);
+    
     if (validate(key))
     {
       Serial.print(key);
       char ack = readFromOtherSide();
-      if (ack != '\0')
+      if (ack != 'z')
       {
         putOnBoard(key, player);
+        updateDisplay();
         changeTurn();
       }
     }
   }
   else
   {
-    char key = getFromOtherSide();
+    digitalWrite(LED_RED, HIGH);
+    digitalWrite(LED_GREEN, LOW);
+    char key = readFromOtherSide();
+    delay(2);
     if (!validate(key))
     {
-      
+      Serial.write('z');
+      return;
     }
+    Serial.write('1');
+    putOnBoard(key, turn);
+    updateDisplay();
+    changeTurn();
   }
 }
 
 bool validate(char c)
 {
-  int n = (int) c - '1';
   // n is in range [0, 8]
-  if (n > 8 || n < 0)
+  if (c > '8' || c < '0')
     return false;
   if (getFromBoard(c) == '-')
     return true;
@@ -123,9 +142,9 @@ void changeTurn()
     turn = 'X';
 }
 
-void putOnBoard(char position, char xo)
+void putOnBoard(char pos, char xo)
 {
-  int n = (int) c - '1';
+  int n = (int) pos - '1';
   board[n/3][n%3] = xo;
 }
 
@@ -137,22 +156,36 @@ int getFromBoard(char c)
 
 char readFromOtherSide()
 {
+  digitalWrite(LED_YELLOW, HIGH);
   while (!Serial.available());
-  return Serial.read();
+  digitalWrite(LED_YELLOW, LOW);
+  char s = Serial.read();
+  lcd.setCursor(0, 4);
+  lcd.print(s);
+  delay(10);
+  return s;
+}
+
+void updateDisplay()
+{
+  displayBoard();
+  for (int i = 0; i < 9; ++i)
+    if (board[i/3][i%3] != '-')
+      turnLEDOn(i, board[i/3][i%3]);
 }
 
 void displayBoard()
 {
   lcd.clear();
   for (int i = 0; i < 3; ++i)
-  {
-    lcd.setCursor(i, 0);
     for (int j = 0; j < 3; ++j)
+    {
+      lcd.setCursor(j, i);
       lcd.print(board[i][j]);
-  }
+    }
 }
 
-void turnLEDOn(int n)
+void turnLEDOn(int n, int player)
 {
   if (player == 'X')
   {
